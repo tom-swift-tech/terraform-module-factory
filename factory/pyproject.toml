@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tf-factory"
+version = "0.1.0"
+description = "Terraform module factory for policy-aligned multi-cloud modules"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Platform Engineering" }]
+dependencies = [
+  "typer>=0.12.0",
+  "PyYAML>=6.0",
+  "jsonschema>=4.22.0",
+  "Jinja2>=3.1.0",
+  "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+tf-factory = "tf_factory.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+tf_factory = ["py.typed"]

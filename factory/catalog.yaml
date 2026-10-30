@@ -1,0 +1,37 @@
+# Maps logical module names to local paths and Terraform Enterprise registry addresses.
+# Replace <org> with your TFE/HCP Terraform organization name.
+organization: "<org>"
+registry_host: "app.terraform.io"
+modules:
+  azure/naming:
+    description: Policy-driven Azure resource naming helpers
+    local_path: modules/azure/naming
+    tfe_name: naming
+    tfe_provider: azure
+    version: "~> 1.0"
+  azure/private-endpoint:
+    description: Azure Private Endpoint with optional Private DNS zone group
+    local_path: modules/azure/private-endpoint
+    tfe_name: private-endpoint
+    tfe_provider: azure
+    version: "~> 1.0"
+    depends_on:
+      - azure/naming
+  azure/key-vault:
+    description: Key Vault with public access disabled and Private Endpoint
+    local_path: modules/azure/key-vault
+    tfe_name: key-vault
+    tfe_provider: azure
+    version: "~> 1.0"
+    depends_on:
+      - azure/naming
+      - azure/private-endpoint
+  azure/storage:
+    description: Storage Account locked to Private Link with defense-in-depth ACLs
+    local_path: modules/azure/storage
+    tfe_name: storage
+    tfe_provider: azure
+    version: "~> 1.0"
+    depends_on:
+      - azure/naming
+      - azure/private-endpoint
