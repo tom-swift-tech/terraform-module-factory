@@ -2,15 +2,17 @@
 
 Key Vault with public network access disabled, RBAC, soft delete, and composed Private Endpoint.
 
+Requires **azurerm ~> 4.0** (`rbac_authorization_enabled`).
+
 ## Secure baseline
 
 | Control | Default |
 |---------|---------|
 | `public_network_access_enabled` | `false` |
-| `enable_rbac_authorization` | `true` |
+| `rbac_authorization_enabled` | `true` |
 | Soft delete retention | 90 days |
-| Purge protection | `true` |
+| Purge protection | on unless `tags.Environment == "dev"` (overridable) |
 | Private Endpoint | created (`create_private_endpoint = true`) |
-| Network ACLs | `Deny` default — defense-in-depth only |
+| Network ACLs | `Deny` — defense-in-depth only |
 
-Set `allow_public_network_access = true` only as an explicit break-glass; CI Checkov rules fail this pattern.
+Plan-time denial of public access belongs in OPA/TFE ([`policies/opa/`](../../../policies/opa/)).
