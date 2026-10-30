@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Optional
 
@@ -11,8 +12,10 @@ from rich.table import Table
 
 from tf_factory import __version__
 from tf_factory.catalog import list_modules, load_catalog
+from tf_factory.generate_naming import generate_naming_module
 from tf_factory.naming import render_name
 from tf_factory.policy import naming_policy, repo_root_from, validate_policies_dir
+from tf_factory.policy_engine import attribute_requirements, required_tags, tag_value_patterns
 from tf_factory.scaffold import scaffold_module
 
 app = typer.Typer(
@@ -96,16 +99,18 @@ def list_modules_cmd(
     table = Table(title="Module catalog")
     table.add_column("Name")
     table.add_column("Description")
-    table.add_column("Local path")
+    table.add_column("Source dir")
     table.add_column("TFE source")
     table.add_column("Version")
+    table.add_column("Constraint")
     for row in rows:
         table.add_row(
             row["name"],
             row["description"],
-            row["local_path"],
+            row["source_directory"],
             row["tfe_source"],
             row["version"],
+            row["version_constraint"],
         )
     console.print(table)
 
@@ -140,6 +145,53 @@ def render_name_cmd(
     console.print(name)
 
 
+@app.command("generate-naming")
+def generate_naming_cmd(
+    policies: Optional[Path] = typer.Option(
+        None,
+        "--policies",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        resolve_path=True,
+    ),
+) -> None:
+    """Regenerate modules/azure/naming from the NamingStandard policy."""
+    policies_dir = _policies_dir(policies)
+    out = generate_naming_module(policies_dir)
+    console.print(f"[green]Generated[/green] {out}")
+
+
+@app.command("export-policy-data")
+def export_policy_data_cmd(
+    policies: Optional[Path] = typer.Option(
+        None,
+        "--policies",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        resolve_path=True,
+    ),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        help="Write JSON for OPA (defaults to policies/opa/data/policy_pack.json)",
+    ),
+) -> None:
+    """Export require/deny/tag rules as JSON for OPA / TFE policy sets."""
+    policies_dir = _policies_dir(policies)
+    root = repo_root_from(policies_dir)
+    out = output or (root / "policies" / "opa" / "data" / "policy_pack.json")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "required_tags": required_tags(policies_dir),
+        "tag_value_patterns": tag_value_patterns(policies_dir),
+        "attribute_rules": attribute_requirements(policies_dir, "azure"),
+    }
+    out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    console.print(f"[green]Wrote[/green] {out} ({len(payload['attribute_rules'])} attribute rules)")
+
+
 @app.command("scaffold")
 def scaffold_cmd(
     cloud: str = typer.Option("azure", "--cloud", help="Target cloud: azure|aws|gcp"),
@@ -171,7 +223,6 @@ def scaffold_cmd(
 
     policies_dir = _policies_dir(from_policy)
     if cloud != "azure":
-        # Templates currently ship for azure; create cloud template dir message
         template_root = repo_root_from(policies_dir) / "factory" / "templates" / cloud / "module"
         if not template_root.is_dir():
             console.print(
@@ -194,6 +245,7 @@ def scaffold_cmd(
         raise typer.Exit(code=1) from exc
 
     console.print(f"[green]Scaffolded[/green] {module_dir}")
+    console.print("Run: terraform -chdir=%s init -backend=false && terraform -chdir=%s validate" % (module_dir, module_dir))
 
 
 if __name__ == "__main__":
