@@ -2,6 +2,8 @@
 
 Platform engineering toolkit for building Terraform modules that meet **secure baselines**, **naming standards**, and **Private Link–first networking**. Azure is the primary target; AWS and GCP share the same layout and policy schema.
 
+**Coding agents:** read [`AGENTS.md`](AGENTS.md) before changing policies, modules, or the factory CLI.
+
 ## What you get
 
 | Area | Contents |
