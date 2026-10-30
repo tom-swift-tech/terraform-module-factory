@@ -1,0 +1,96 @@
+{
+  "required_tags": [
+    "Environment",
+    "Owner",
+    "CostCenter",
+    "DataClassification"
+  ],
+  "tag_value_patterns": {
+    "Environment": "^(dev|test|staging|prod)$",
+    "DataClassification": "^(public|internal|confidential|restricted)$",
+    "Owner": ".+",
+    "CostCenter": ".+"
+  },
+  "attribute_rules": [
+    {
+      "id": "deny-public-network-access",
+      "resource_type": "azurerm_storage_account",
+      "attribute": "public_network_access_enabled",
+      "op": "eq",
+      "value": false,
+      "severity": "error"
+    },
+    {
+      "id": "deny-public-network-access",
+      "resource_type": "azurerm_key_vault",
+      "attribute": "public_network_access_enabled",
+      "op": "eq",
+      "value": false,
+      "severity": "error"
+    },
+    {
+      "id": "require-tls-min-1-2",
+      "resource_type": "azurerm_storage_account",
+      "attribute": "min_tls_version",
+      "op": "eq",
+      "value": "TLS1_2",
+      "severity": "error"
+    },
+    {
+      "id": "deny-public-blob-access",
+      "resource_type": "azurerm_storage_account",
+      "attribute": "allow_nested_items_to_be_public",
+      "op": "eq",
+      "value": false,
+      "severity": "error"
+    },
+    {
+      "id": "require-kv-rbac",
+      "resource_type": "azurerm_key_vault",
+      "attribute": "rbac_authorization_enabled",
+      "op": "eq",
+      "value": true,
+      "severity": "error"
+    },
+    {
+      "id": "require-kv-soft-delete",
+      "resource_type": "azurerm_key_vault",
+      "attribute": "soft_delete_retention_days",
+      "op": "eq",
+      "value": 90,
+      "severity": "error"
+    },
+    {
+      "id": "require-kv-purge-protection",
+      "resource_type": "azurerm_key_vault",
+      "attribute": "purge_protection_enabled",
+      "op": "eq",
+      "value": true,
+      "severity": "warning"
+    },
+    {
+      "id": "require-https-only",
+      "resource_type": "azurerm_storage_account",
+      "attribute": "https_traffic_only_enabled",
+      "op": "eq",
+      "value": true,
+      "severity": "error"
+    },
+    {
+      "id": "deny-public-acl-as-primary",
+      "resource_type": "azurerm_storage_account",
+      "attribute": "public_network_access_enabled",
+      "op": "deny_eq",
+      "value": true,
+      "severity": "error"
+    },
+    {
+      "id": "deny-public-acl-as-primary",
+      "resource_type": "azurerm_key_vault",
+      "attribute": "public_network_access_enabled",
+      "op": "deny_eq",
+      "value": true,
+      "severity": "error"
+    }
+  ]
+}

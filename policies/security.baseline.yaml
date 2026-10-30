@@ -33,12 +33,12 @@ rules:
       allow_nested_items_to_be_public: false
 
   - id: require-kv-rbac
-    description: Key Vault must use Azure RBAC authorization
+    description: Key Vault must use Azure RBAC authorization (azurerm 4.x attribute rbac_authorization_enabled)
     severity: error
     resource_types:
       - azurerm_key_vault
     require:
-      enable_rbac_authorization: true
+      rbac_authorization_enabled: true
 
   - id: require-kv-soft-delete
     description: Key Vault soft delete must remain enabled
