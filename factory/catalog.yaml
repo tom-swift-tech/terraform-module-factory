@@ -1,37 +1,82 @@
-# Maps logical module names to local paths and Terraform Enterprise registry addresses.
-# Replace <org> with your TFE/HCP Terraform organization name.
+# Maps logical module names to local paths and HCP Terraform / TFE registry metadata.
+#
+# Publishing model (chosen): monorepo + VCS-driven modules with source directory.
+# Each catalog entry's `source_directory` is the subdirectory registered in HCP/TFE.
+# See docs/TFE_PUBLISHING.md.
+#
+# Replace <org> with your HCP Terraform / TFE organization name.
 organization: "<org>"
 registry_host: "app.terraform.io"
 modules:
   azure/naming:
     description: Policy-driven Azure resource naming helpers
     local_path: modules/azure/naming
+    source_directory: modules/azure/naming
     tfe_name: naming
-    tfe_provider: azure
-    version: "~> 1.0"
+    tfe_provider: azurerm
+    # Semver of the module when tagged/published (not a consumer constraint)
+    version: "1.0.0"
+    # Constraint consumers should use
+    version_constraint: "~> 1.0"
+    required_inputs:
+      workload: var.workload
+      environment: var.environment
+      region: var.location
+      suffix: var.suffix
+
   azure/private-endpoint:
     description: Azure Private Endpoint with optional Private DNS zone group
     local_path: modules/azure/private-endpoint
+    source_directory: modules/azure/private-endpoint
     tfe_name: private-endpoint
-    tfe_provider: azure
-    version: "~> 1.0"
+    tfe_provider: azurerm
+    version: "1.0.0"
+    version_constraint: "~> 1.0"
     depends_on:
       - azure/naming
+    required_inputs:
+      name: var.private_endpoint_name
+      resource_group_name: var.resource_group_name
+      location: var.location
+      subnet_id: var.private_endpoint_subnet_id
+      private_connection_resource_id: var.private_connection_resource_id
+      subresource_names: var.private_endpoint_subresources
+      private_dns_zone_ids: var.private_dns_zone_ids
+      tags: var.tags
+
   azure/key-vault:
     description: Key Vault with public access disabled and Private Endpoint
     local_path: modules/azure/key-vault
+    source_directory: modules/azure/key-vault
     tfe_name: key-vault
-    tfe_provider: azure
-    version: "~> 1.0"
+    tfe_provider: azurerm
+    version: "1.0.0"
+    version_constraint: "~> 1.0"
     depends_on:
       - azure/naming
       - azure/private-endpoint
+    required_inputs:
+      name: module.naming.key_vault
+      resource_group_name: var.resource_group_name
+      location: var.location
+      tenant_id: var.tenant_id
+      private_endpoint_subnet_id: var.private_endpoint_subnet_id
+      tags: var.tags
+
   azure/storage:
     description: Storage Account locked to Private Link with defense-in-depth ACLs
     local_path: modules/azure/storage
+    source_directory: modules/azure/storage
     tfe_name: storage
-    tfe_provider: azure
-    version: "~> 1.0"
+    tfe_provider: azurerm
+    version: "1.0.0"
+    version_constraint: "~> 1.0"
     depends_on:
       - azure/naming
       - azure/private-endpoint
+    required_inputs:
+      name: module.naming.storage_account
+      resource_group_name: var.resource_group_name
+      location: var.location
+      private_endpoint_subnet_id: var.private_endpoint_subnet_id
+      tags: var.tags
