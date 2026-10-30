@@ -1,0 +1,108 @@
+# Azure DevOps pipeline for Terraform module CI
+# Wire this as a pipeline YAML path in your ADO project.
+#
+# Required secret variables (Library or pipeline):
+#   TFE_TOKEN          — optional; only for publish stage
+#   TFE_ORG            — optional TFE/HCP Terraform organization
+#
+# Variable group suggestion: tf-factory-ci
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - modules/**
+      - policies/**
+      - factory/**
+      - checkov/**
+      - examples/**
+      - .checkov.yaml
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  TF_VERSION: "1.7.5"
+  PYTHON_VERSION: "3.11"
+
+stages:
+  - stage: Validate
+    displayName: Validate policies and modules
+    jobs:
+      - job: PolicyAndModules
+        displayName: Policy + Terraform + Checkov
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: $(PYTHON_VERSION)
+
+          - script: |
+              python -m pip install --upgrade pip
+              pip install -e ./factory
+              pip install checkov
+            displayName: Install tf-factory and Checkov
+
+          - script: |
+              tf-factory validate-policy --policies ./policies
+            displayName: Validate policy pack
+
+          - task: TerraformInstaller@1
+            displayName: Install Terraform
+            inputs:
+              terraformVersion: $(TF_VERSION)
+
+          - script: |
+              set -euo pipefail
+              echo "== terraform fmt =="
+              terraform fmt -check -recursive modules examples
+
+              echo "== terraform validate (modules) =="
+              for dir in modules/azure/*/; do
+                echo "--- $dir"
+                # naming has no providers; still init/validate
+                (cd "$dir" && terraform init -backend=false -input=false && terraform validate)
+              done
+
+              echo "== terraform validate (examples) =="
+              for dir in examples/*/; do
+                echo "--- $dir"
+                (cd "$dir" && terraform init -backend=false -input=false && terraform validate)
+              done
+            displayName: Terraform fmt and validate
+
+          - script: |
+              checkov -d modules -d examples --config-file .checkov.yaml --framework terraform
+            displayName: Run Checkov
+
+  - stage: PublishTFE
+    displayName: Publish to Terraform Enterprise (manual)
+    dependsOn: Validate
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job: Publish
+        displayName: Documented publish placeholder
+        steps:
+          - script: |
+              echo "Publish modules to TFE/HCP Terraform private registry."
+              echo "Recommended approaches:"
+              echo "  1) VCS-driven modules connected to this repo (preferred)"
+              echo "  2) terraform modules publish with TFE_TOKEN / TFE_ORG"
+              echo ""
+              echo "Catalog sources are defined in factory/catalog.yaml"
+              echo "Replace <org> with your organization before consumers reference modules."
+              if [ -z "${TFE_TOKEN:-}" ]; then
+                echo "##vso[task.logissue type=warning]TFE_TOKEN not set — skipping live publish."
+              else
+                echo "TFE_TOKEN is set. Wire your preferred publish CLI here."
+              fi
+            displayName: TFE publish guidance
+            env:
+              TFE_TOKEN: $(TFE_TOKEN)
+              TFE_ORG: $(TFE_ORG)

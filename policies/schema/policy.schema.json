@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tf-factory.local/schemas/policy.schema.json",
+  "title": "Terraform Module Factory Policy",
+  "description": "Schema for YAML/JSON policy files consumed by tf-factory",
+  "type": "object",
+  "required": ["apiVersion", "kind"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "tf-factory/v1"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "NamingStandard",
+        "SecurityBaseline",
+        "NetworkingPrivate",
+        "TagsRequired"
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "cloud": {
+      "type": "string",
+      "enum": ["azure", "aws", "gcp", "multi"]
+    },
+    "pattern": {
+      "type": "string",
+      "description": "Naming pattern with {placeholders}"
+    },
+    "resource_prefixes": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "resource_constraints": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "max_length": { "type": "integer", "minimum": 1 },
+          "min_length": { "type": "integer", "minimum": 1 },
+          "charset": { "type": "string" },
+          "separator": { "type": "string" },
+          "lowercase": { "type": "boolean" },
+          "no_hyphens": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "environments": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "regions": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "required_tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "tag_value_patterns": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "severity": {
+            "type": "string",
+            "enum": ["error", "warning"]
+          },
+          "resource_types": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "when": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "require": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "must_reference_module": { "type": "string" },
+          "deny": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "required_module_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "kind": { "const": "NamingStandard" } }
+      },
+      "then": {
+        "required": ["pattern", "resource_prefixes"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "TagsRequired" } }
+      },
+      "then": {
+        "required": ["required_tags"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": ["SecurityBaseline", "NetworkingPrivate"]
+          }
+        }
+      },
+      "then": {
+        "required": ["cloud", "rules"]
+      }
+    }
+  ]
+}

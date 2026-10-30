@@ -1,0 +1,55 @@
+# Replace this file with your organization's naming standards.
+# Keep the same schema (apiVersion/kind) so tf-factory and modules/azure/naming continue to work.
+apiVersion: tf-factory/v1
+kind: NamingStandard
+metadata:
+  name: azure-naming-example
+  description: Example Azure naming standard — swap for your real standards
+cloud: azure
+pattern: "{prefix}-{workload}-{env}-{region}-{suffix}"
+resource_prefixes:
+  resource_group: rg
+  storage_account: st
+  key_vault: kv
+  private_endpoint: pe
+  virtual_network: vnet
+  subnet: snet
+  network_security_group: nsg
+  log_analytics_workspace: log
+  application_insights: appi
+environments:
+  - dev
+  - test
+  - staging
+  - prod
+regions:
+  eastus: eus
+  eastus2: eus2
+  westus2: wus2
+  westeurope: weu
+  northeurope: neu
+resource_constraints:
+  storage_account:
+    max_length: 24
+    min_length: 3
+    charset: "[a-z0-9]"
+    no_hyphens: true
+    lowercase: true
+  key_vault:
+    max_length: 24
+    min_length: 3
+    charset: "[a-zA-Z0-9-]"
+    lowercase: true
+  private_endpoint:
+    max_length: 64
+    min_length: 2
+    charset: "[a-zA-Z0-9-]"
+  resource_group:
+    max_length: 90
+    min_length: 1
+    charset: "[a-zA-Z0-9-_().]"
+required_tags:
+  - Environment
+  - Owner
+  - CostCenter
+  - DataClassification

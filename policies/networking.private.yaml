@@ -1,0 +1,49 @@
+apiVersion: tf-factory/v1
+kind: NetworkingPrivate
+metadata:
+  name: private-connectivity-first
+  description: >
+    Private Endpoints / Private Link are required. Network ACLs are defense-in-depth
+    only and must never be the primary exposure control.
+cloud: azure
+defaults:
+  public_network_access_enabled: false
+  prefer_private_endpoint: true
+  network_acls_as_primary: false
+required_module_refs:
+  - azure/private-endpoint
+rules:
+  - id: require-private-endpoint
+    description: Storage and Key Vault modules must compose azure/private-endpoint
+    severity: error
+    when:
+      - storage
+      - key_vault
+    must_reference_module: azure/private-endpoint
+
+  - id: deny-public-acl-as-primary
+    description: >
+      Do not rely on IP/VNet ACLs with public network access enabled.
+      Private Link is mandatory; ACLs only harden residual paths.
+    severity: error
+    resource_types:
+      - azurerm_storage_account
+      - azurerm_key_vault
+    deny:
+      public_network_access_enabled: true
+
+  - id: require-pe-subnet
+    description: Private endpoints must be placed on a dedicated PE subnet
+    severity: warning
+    when:
+      - private_endpoint
+    require:
+      subnet_delegations_empty: true
+
+  - id: require-private-dns
+    description: Private endpoints should register into Private DNS zones
+    severity: warning
+    when:
+      - private_endpoint
+    require:
+      private_dns_zone_group: true

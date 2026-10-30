@@ -1,0 +1,16 @@
+apiVersion: tf-factory/v1
+kind: TagsRequired
+metadata:
+  name: required-resource-tags
+  description: Mandatory tags on all Azure resources created by factory modules
+cloud: azure
+required_tags:
+  - Environment
+  - Owner
+  - CostCenter
+  - DataClassification
+tag_value_patterns:
+  Environment: "^(dev|test|staging|prod)$"
+  DataClassification: "^(public|internal|confidential|restricted)$"
+  Owner: ".+"
+  CostCenter: ".+"

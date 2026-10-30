@@ -1,0 +1,65 @@
+apiVersion: tf-factory/v1
+kind: SecurityBaseline
+metadata:
+  name: azure-security-baseline
+  description: Secure baseline configuration for Azure modules
+cloud: azure
+required_module_refs:
+  - azure/naming
+rules:
+  - id: deny-public-network-access
+    description: Public network access must be disabled on PaaS data services
+    severity: error
+    resource_types:
+      - azurerm_storage_account
+      - azurerm_key_vault
+    require:
+      public_network_access_enabled: false
+
+  - id: require-tls-min-1-2
+    description: Storage accounts must enforce TLS 1.2 or higher
+    severity: error
+    resource_types:
+      - azurerm_storage_account
+    require:
+      min_tls_version: TLS1_2
+
+  - id: deny-public-blob-access
+    description: Allow Blob public access must be disabled
+    severity: error
+    resource_types:
+      - azurerm_storage_account
+    require:
+      allow_nested_items_to_be_public: false
+
+  - id: require-kv-rbac
+    description: Key Vault must use Azure RBAC authorization
+    severity: error
+    resource_types:
+      - azurerm_key_vault
+    require:
+      enable_rbac_authorization: true
+
+  - id: require-kv-soft-delete
+    description: Key Vault soft delete must remain enabled
+    severity: error
+    resource_types:
+      - azurerm_key_vault
+    require:
+      soft_delete_retention_days: 90
+
+  - id: require-kv-purge-protection
+    description: Key Vault purge protection must be enabled in non-dev
+    severity: warning
+    resource_types:
+      - azurerm_key_vault
+    require:
+      purge_protection_enabled: true
+
+  - id: require-https-only
+    description: Storage must force HTTPS
+    severity: error
+    resource_types:
+      - azurerm_storage_account
+    require:
+      https_traffic_only_enabled: true
