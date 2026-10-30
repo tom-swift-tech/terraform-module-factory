@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -31,7 +32,8 @@ def tfe_source(catalog: dict[str, Any], logical_name: str) -> str:
     entry = modules[logical_name]
     host = catalog.get("registry_host", "app.terraform.io")
     org = catalog.get("organization", "<org>")
-    return f"{host}/{org}/{entry['tfe_name']}/{entry['tfe_provider']}"
+    provider = entry.get("tfe_provider", "azurerm")
+    return f"{host}/{org}/{entry['tfe_name']}/{provider}"
 
 
 def local_source(
@@ -45,13 +47,7 @@ def local_source(
     root = (root or repo_root_from(from_path)).resolve()
     entry = catalog["modules"][logical_name]
     target = (root / entry["local_path"]).resolve()
-    return os_relpath(from_path.resolve(), target)
-
-
-def os_relpath(start: Path, target: Path) -> str:
-    import os
-
-    return os.path.relpath(target, start).replace("\\", "/")
+    return os.path.relpath(target, from_path.resolve()).replace("\\", "/")
 
 
 def list_modules(catalog: dict[str, Any] | None = None) -> list[dict[str, Any]]:
@@ -63,9 +59,12 @@ def list_modules(catalog: dict[str, Any] | None = None) -> list[dict[str, Any]]:
                 "name": name,
                 "description": entry.get("description", ""),
                 "local_path": entry.get("local_path", ""),
+                "source_directory": entry.get("source_directory", entry.get("local_path", "")),
                 "tfe_source": tfe_source(catalog, name),
                 "version": entry.get("version", ""),
+                "version_constraint": entry.get("version_constraint", ""),
                 "depends_on": entry.get("depends_on", []),
+                "required_inputs": entry.get("required_inputs", {}),
             }
         )
     return rows
@@ -84,33 +83,34 @@ def resolve_refs(
     root = root or repo_root_from(from_path)
     for ref in refs:
         if ref not in catalog["modules"]:
-            # Still emit a stub so scaffolds document the intended dependency
             resolved.append(
                 {
                     "logical_name": ref,
                     "module_label": ref.split("/")[-1].replace("-", "_"),
-                    "source": f"app.terraform.io/<org>/{ref.split('/')[-1]}/{ref.split('/')[0]}"
-                    if use_tfe
-                    else f"../../{ref}",
-                    "version": "~> 1.0" if use_tfe else None,
+                    "source": (
+                        f"app.terraform.io/<org>/{ref.split('/')[-1]}/azurerm"
+                        if use_tfe
+                        else f"../../{ref}"
+                    ),
+                    "version": None,
+                    "version_constraint": "~> 1.0" if use_tfe else None,
                     "known": False,
+                    "required_inputs": {},
                 }
             )
             continue
         entry = catalog["modules"][ref]
-        source = (
-            tfe_source(catalog, ref)
-            if use_tfe
-            else local_source(catalog, ref, from_path, root=root)
-        )
+        source = tfe_source(catalog, ref) if use_tfe else local_source(catalog, ref, from_path, root=root)
         resolved.append(
             {
                 "logical_name": ref,
                 "module_label": entry.get("tfe_name", ref.split("/")[-1]).replace("-", "_"),
                 "source": source,
                 "version": entry.get("version") if use_tfe else None,
+                "version_constraint": entry.get("version_constraint") if use_tfe else None,
                 "known": True,
                 "depends_on": entry.get("depends_on", []),
+                "required_inputs": entry.get("required_inputs") or {},
             }
         )
     return resolved
