@@ -34,6 +34,8 @@ resource "azurerm_storage_account" "this" {
   https_traffic_only_enabled      = true
   allow_nested_items_to_be_public = false
   public_network_access_enabled   = local.public_network_access_enabled
+  # Prefer Azure AD. When shared keys are disabled, the provider must use
+  # storage_use_azuread = true (see examples) or plan/refresh hits data-plane 403s.
   shared_access_key_enabled       = var.shared_access_key_enabled
   default_to_oauth_authentication = true
   tags                            = var.tags
