@@ -1,0 +1,29 @@
+/**
+ * {{ module_name }} — scaffolded by tf-factory
+ *
+ * Secure baseline defaults:
+ * - Public network access disabled unless allow_public_network_access is explicitly true
+ * - Private Endpoint composition preferred over public ACL exposure
+ * - Required platform tags enforced via variable validation
+ */
+
+locals {
+  tags = var.tags
+
+  # Defense-in-depth only — never a substitute for Private Link
+  public_network_access_enabled = var.allow_public_network_access
+}
+
+{% for dep in dependencies %}
+module "{{ dep.module_label }}" {
+  source = "{{ dep.source }}"
+{% if dep.version %}
+  version = "{{ dep.version }}"
+{% endif %}
+  # TODO: wire required inputs for {{ dep.logical_name }}
+}
+
+{% endfor %}
+# TODO: implement {{ module_name }} resources below.
+# Keep public_network_access_enabled = local.public_network_access_enabled (default false).
+# Compose module.private_endpoint (or azure/private-endpoint) for data-plane access.

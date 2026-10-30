@@ -1,0 +1,14 @@
+output "name" {
+  description = "Primary resource name."
+  value       = var.name
+}
+
+output "resource_group_name" {
+  description = "Resource group name."
+  value       = var.resource_group_name
+}
+
+output "tags" {
+  description = "Tags applied by this module."
+  value       = local.tags
+}

@@ -1,0 +1,44 @@
+# {{ cloud }}/{{ module_name }}
+
+Scaffolded by **tf-factory** against the platform policy pack.
+
+## Secure baseline
+
+- Public network access defaults to **disabled**
+- Prefer **Private Endpoint / Private Link** over public exposure with ACLs
+- Required tags: {{ required_tags | join(', ') }}
+
+## Module references
+
+{% if dependencies %}
+| Logical name | Source |
+|--------------|--------|
+{% for dep in dependencies %}
+| `{{ dep.logical_name }}` | `{{ dep.source }}` |
+{% endfor %}
+{% else %}
+No automatic dependencies were injected. Add catalog modules as needed.
+{% endif %}
+
+## Usage
+
+```hcl
+module "{{ module_label }}" {
+  source              = "../{{ module_name }}"
+  name                = "example"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  tags = {
+{% for tag in required_tags %}
+    {{ tag }} = "replace-me"
+{% endfor %}
+  }
+}
+```
+
+## Next steps
+
+1. Implement resources in `main.tf`
+2. Keep `allow_public_network_access` defaulted to `false`
+3. Wire Private Endpoint inputs
+4. Run Checkov and `terraform validate` before publishing to TFE
