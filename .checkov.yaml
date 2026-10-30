@@ -1,0 +1,21 @@
+# Checkov configuration for the Terraform Module Factory
+compact: true
+framework:
+  - terraform
+directory:
+  - modules
+  - examples
+download-external-modules: false
+evaluate-variables: true
+external-checks-dir:
+  - checkov/custom_checks
+quiet: false
+soft-fail: false
+# Skips for controls deferred beyond the v1 private-link baseline:
+# - CMK encryption is org-specific (key vault + identity wiring)
+# - Queue logging only applies when Queue service is in use
+skip-check:
+  - CKV2_AZURE_1
+  - CKV_AZURE_33
+  # Variable-driven replication; module validation requires ZRS or better
+  - CKV_AZURE_206
