@@ -1,0 +1,50 @@
+[
+  {
+    "resource_type": "key_vault",
+    "workload": "claimsprocessing",
+    "env": "prod",
+    "region": "eastus2",
+    "suffix": "01",
+    "expected": "kv-claimspr-prod-eus2-01"
+  },
+  {
+    "resource_type": "key_vault",
+    "workload": "claimsprocessing",
+    "env": "prod",
+    "region": "eastus2",
+    "suffix": "02",
+    "expected": "kv-claimspr-prod-eus2-02"
+  },
+  {
+    "resource_type": "storage_account",
+    "workload": "claimsprocessingsvc",
+    "env": "staging",
+    "region": "eastus",
+    "suffix": "01",
+    "expected": "stclaimsprocstagingeus01"
+  },
+  {
+    "resource_type": "storage_account",
+    "workload": "payments",
+    "env": "prod",
+    "region": "eastus",
+    "suffix": "01",
+    "expected": "stpaymentsprodeus01"
+  },
+  {
+    "resource_type": "private_endpoint",
+    "workload": "claimsprocessing",
+    "env": "prod",
+    "region": "eastus2",
+    "suffix": "01",
+    "expected": "pe-claimsprocessing-prod-eus2-01"
+  },
+  {
+    "resource_type": "key_vault",
+    "workload": "app",
+    "env": "dev",
+    "region": "eastus",
+    "suffix": "01",
+    "expected": "kv-app-dev-eus-01"
+  }
+]

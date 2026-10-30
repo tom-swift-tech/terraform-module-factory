@@ -32,8 +32,9 @@ variable "soft_delete_retention_days" {
 
 variable "purge_protection_enabled" {
   type        = bool
-  description = "Enable purge protection (recommended outside short-lived sandboxes)."
-  default     = true
+  nullable    = true
+  description = "Override purge protection. When null, enabled unless tags.Environment is \"dev\" (matches security.baseline policy)."
+  default     = null
 }
 
 variable "allow_public_network_access" {
