@@ -15,12 +15,15 @@ class RequireKeyVaultRbac(BaseResourceCheck):
         super().__init__(name=name, id=id, categories=categories, supported_resources=supported_resources)
 
     def scan_resource_conf(self, conf: dict) -> CheckResult:
-        value = conf.get("enable_rbac_authorization")
-        if value is None:
+        # azurerm 4.x renamed enable_rbac_authorization -> rbac_authorization_enabled
+        for key in ("rbac_authorization_enabled", "enable_rbac_authorization"):
+            value = conf.get(key)
+            if value is None:
+                continue
+            enabled = value[0] if isinstance(value, list) else value
+            if enabled is True or enabled == "true":
+                return CheckResult.PASSED
             return CheckResult.FAILED
-        enabled = value[0] if isinstance(value, list) else value
-        if enabled is True or enabled == "true":
-            return CheckResult.PASSED
         return CheckResult.FAILED
 
 

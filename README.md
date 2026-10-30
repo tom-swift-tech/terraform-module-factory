@@ -8,13 +8,15 @@ Platform engineering toolkit for building Terraform modules that meet **secure b
 
 | Area | Contents |
 |------|----------|
-| **Policy pack** | YAML/JSON requirements under [`policies/`](policies/) (naming, security, private networking, tags) |
-| **Factory CLI** | Python `tf-factory` — validate policies, scaffold modules, render names, list catalog |
-| **Azure catalog** | `naming`, `private-endpoint`, `key-vault`, `storage` — private by default |
-| **Checkov** | Custom checks mirroring the policy pack |
-| **Azure DevOps** | CI template for fmt / validate / Checkov / TFE publish guidance |
+| **Policy pack** | YAML/JSON under [`policies/`](policies/) — source of truth for naming, security, networking, tags |
+| **Factory CLI** | `tf-factory` — validate, `generate-naming`, `export-policy-data`, scaffold, render-name |
+| **Azure catalog** | `naming` (generated from policy), `private-endpoint`, `key-vault`, `storage` |
+| **OPA (TFE)** | Plan-time enforcement in [`policies/opa/`](policies/opa/) — Checkov covers CI defaults only |
+| **Azure DevOps** | pytest, tflint, terraform test, Checkov, catalog listing for VCS publish |
 
-**Networking stance:** Private Endpoints / Private Link are required. Network ACLs are defense-in-depth only — never the primary exposure control.
+**Networking stance:** Private Endpoints / Private Link are required. Network ACLs are defense-in-depth only.
+
+**Publishing:** monorepo + HCP/TFE VCS modules with `source_directory` — see [`docs/TFE_PUBLISHING.md`](docs/TFE_PUBLISHING.md).
 
 ## Repository layout
 
@@ -44,18 +46,21 @@ cd ..
 tf-factory validate-policy --policies ./policies
 ```
 
-### 3. Render a name (example naming standard)
+### 3. Naming (policy → module)
+
+Replace [`policies/naming.example.yaml`](policies/naming.example.yaml) with your standards, then:
 
 ```bash
-tf-factory render-name \
-  --type storage_account \
-  --workload payments \
-  --env prod \
-  --region eastus \
-  --suffix 01
+tf-factory generate-naming --policies ./policies
+tf-factory render-name --type key_vault --workload claimsprocessing --env prod --region eastus2 --suffix 01
+# → kv-claimspr-prod-eus2-01  (suffix preserved; 01 vs 02 do not collide)
 ```
 
-Replace [`policies/naming.example.yaml`](policies/naming.example.yaml) with your real naming standards (keep `apiVersion` / `kind`).
+### 3b. Export OPA data for TFE
+
+```bash
+tf-factory export-policy-data --policies ./policies
+```
 
 ### 4. List catalog modules
 
