@@ -11,34 +11,16 @@ Scaffolded by **tf-factory** against the platform policy pack.
 ## Module references
 
 {% if dependencies %}
-| Logical name | Source |
-|--------------|--------|
+| Logical name | Source | Inputs |
+|--------------|--------|--------|
 {% for dep in dependencies %}
-| `{{ dep.logical_name }}` | `{{ dep.source }}` |
+| `{{ dep.logical_name }}` | `{{ dep.source }}` | {{ dep.required_inputs.keys() | list | join(', ') }} |
 {% endfor %}
-{% else %}
-No automatic dependencies were injected. Add catalog modules as needed.
 {% endif %}
-
-## Usage
-
-```hcl
-module "{{ module_label }}" {
-  source              = "../{{ module_name }}"
-  name                = "example"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-  tags = {
-{% for tag in required_tags %}
-    {{ tag }} = "replace-me"
-{% endfor %}
-  }
-}
-```
 
 ## Next steps
 
 1. Implement resources in `main.tf`
 2. Keep `allow_public_network_access` defaulted to `false`
-3. Wire Private Endpoint inputs
-4. Run Checkov and `terraform validate` before publishing to TFE
+3. Wire Private Endpoint target ids
+4. Run `terraform validate` and Checkov before publishing to TFE

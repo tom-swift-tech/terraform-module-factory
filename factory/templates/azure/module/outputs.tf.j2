@@ -1,14 +1,18 @@
-output "name" {
-  description = "Primary resource name."
-  value       = var.name
-}
-
-output "resource_group_name" {
-  description = "Resource group name."
-  value       = var.resource_group_name
-}
-
 output "tags" {
   description = "Tags applied by this module."
   value       = local.tags
 }
+
+{% for dep in dependencies %}
+{% if dep.module_label == "private_endpoint" %}
+output "private_endpoint_ids" {
+  description = "Private Endpoint module instances (count)."
+  value       = module.private_endpoint[*].id
+}
+{% else %}
+output "{{ dep.module_label }}_names" {
+  description = "Outputs from {{ dep.logical_name }}."
+  value       = module.{{ dep.module_label }}
+}
+{% endif %}
+{% endfor %}

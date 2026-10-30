@@ -9,21 +9,25 @@
 
 locals {
   tags = var.tags
-
-  # Defense-in-depth only — never a substitute for Private Link
   public_network_access_enabled = var.allow_public_network_access
 }
 
 {% for dep in dependencies %}
 module "{{ dep.module_label }}" {
   source = "{{ dep.source }}"
-{% if dep.version %}
-  version = "{{ dep.version }}"
+{% if dep.version_constraint %}
+  version = "{{ dep.version_constraint }}"
 {% endif %}
-  # TODO: wire required inputs for {{ dep.logical_name }}
+{% if dep.module_label == "private_endpoint" %}
+  count = var.create_private_endpoint ? 1 : 0
+{% endif %}
+{% for input_name, input_expr in dep.required_inputs.items() %}
+  {{ input_name }} = {{ input_expr }}
+{% else %}
+  # No required_inputs declared in catalog for {{ dep.logical_name }}
+{% endfor %}
 }
 
 {% endfor %}
-# TODO: implement {{ module_name }} resources below.
+# TODO: implement {{ module_name }} resources.
 # Keep public_network_access_enabled = local.public_network_access_enabled (default false).
-# Compose module.private_endpoint (or azure/private-endpoint) for data-plane access.
