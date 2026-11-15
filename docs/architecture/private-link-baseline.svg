@@ -1,1 +1,183 @@
-@/tmp/real_svg_content.svg
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" width="1200" height="780" role="img" aria-labelledby="title desc">
+  <title id="title">Azure Private Link baseline — infrastructure and data flow</title>
+  <desc id="desc">Visio-style diagram for app teams and ISO showing denied public paths, Private Endpoint data path, PaaS baselines, and platform governance controls.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f4e79"/>
+    </marker>
+    <marker id="arrowDeny" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#a4262c"/>
+    </marker>
+    <marker id="arrowOk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0b6a0b"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="780" fill="#f3f6f9"/>
+
+  <!-- Title block -->
+  <rect x="24" y="16" width="1152" height="64" fill="#1f4e79" rx="2"/>
+  <text x="40" y="42" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Terraform Module Factory — Private Link Baseline</text>
+  <text x="40" y="64" fill="#d6e4f0" font-family="Segoe UI, Arial, sans-serif" font-size="13">Audience: Application teams &amp; ISO  ·  Pattern: Private Endpoint / Private Link first; public access disabled; ACLs defense-in-depth only</text>
+
+  <!-- ===================== ZONE: UNTRUSTED ===================== -->
+  <rect x="24" y="100" width="220" height="420" fill="#fde7e9" stroke="#a4262c" stroke-width="2" rx="2"/>
+  <rect x="24" y="100" width="220" height="32" fill="#a4262c"/>
+  <text x="40" y="122" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">UNTRUSTED / INTERNET</text>
+
+  <rect x="44" y="150" width="180" height="70" fill="#ffffff" stroke="#a4262c" stroke-width="1.5"/>
+  <text x="134" y="180" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600">Public clients</text>
+  <text x="134" y="200" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Browsers / SaaS / WAN</text>
+
+  <rect x="44" y="240" width="180" height="70" fill="#ffffff" stroke="#a4262c" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="134" y="270" text-anchor="middle" fill="#a4262c" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600">Public PaaS endpoints</text>
+  <text x="134" y="290" text-anchor="middle" fill="#a4262c" font-family="Segoe UI, Arial, sans-serif" font-size="11">DISABLED by baseline</text>
+
+  <text x="134" y="360" text-anchor="middle" fill="#a4262c" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">DENY</text>
+  <text x="134" y="380" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">public_network_access</text>
+  <text x="134" y="396" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">_enabled = false</text>
+
+  <!-- Denied arrows -->
+  <line x1="224" y1="185" x2="300" y2="185" stroke="#a4262c" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#arrowDeny)"/>
+  <text x="250" y="175" fill="#a4262c" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="700">BLOCKED</text>
+
+  <!-- ===================== ZONE: APP / CORPORATE ===================== -->
+  <rect x="280" y="100" width="280" height="420" fill="#deecf9" stroke="#2b88d8" stroke-width="2" rx="2"/>
+  <rect x="280" y="100" width="280" height="32" fill="#2b88d8"/>
+  <text x="296" y="122" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">APP / CORPORATE NETWORK</text>
+
+  <rect x="300" y="150" width="240" height="56" fill="#ffffff" stroke="#2b88d8" stroke-width="1.5"/>
+  <text x="420" y="175" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600">Application workloads</text>
+  <text x="420" y="193" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">App Service / AKS / VMs / Functions</text>
+
+  <rect x="300" y="222" width="240" height="56" fill="#ffffff" stroke="#2b88d8" stroke-width="1.5"/>
+  <text x="420" y="247" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600">CI / CD runners</text>
+  <text x="420" y="265" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Self-hosted ADO agents (private reach)</text>
+
+  <rect x="300" y="294" width="240" height="56" fill="#ffffff" stroke="#2b88d8" stroke-width="1.5"/>
+  <text x="420" y="319" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600">Private DNS resolvers</text>
+  <text x="420" y="337" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">privatelink.*.windows.net zones</text>
+
+  <rect x="300" y="370" width="240" height="70" fill="#fff4ce" stroke="#986f0b" stroke-width="1.5"/>
+  <text x="420" y="398" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">App team responsibility</text>
+  <text x="420" y="416" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">VNet integration / PE DNS / required tags</text>
+  <text x="420" y="432" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Consume factory modules via TFE registry</text>
+
+  <!-- Allowed data path -->
+  <line x1="560" y1="178" x2="620" y2="178" stroke="#0b6a0b" stroke-width="2.5" marker-end="url(#arrowOk)"/>
+  <text x="575" y="168" fill="#0b6a0b" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="700">ALLOW</text>
+
+  <!-- ===================== ZONE: PRIVATE AZURE ===================== -->
+  <rect x="600" y="100" width="300" height="420" fill="#dff6dd" stroke="#0b6a0b" stroke-width="2" rx="2"/>
+  <rect x="600" y="100" width="300" height="32" fill="#0b6a0b"/>
+  <text x="616" y="122" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">PRIVATE CONNECTIVITY ZONE</text>
+
+  <rect x="620" y="150" width="260" height="80" fill="#ffffff" stroke="#0b6a0b" stroke-width="1.5"/>
+  <text x="750" y="175" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600">Dedicated PE subnet</text>
+  <text x="750" y="193" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">No service delegation</text>
+  <text x="750" y="211" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">module: azure/private-endpoint</text>
+
+  <rect x="620" y="250" width="260" height="90" fill="#ffffff" stroke="#0b6a0b" stroke-width="2"/>
+  <text x="750" y="280" text-anchor="middle" fill="#0b6a0b" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">Private Endpoint</text>
+  <text x="750" y="300" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12">Private Link / Microsoft backbone</text>
+  <text x="750" y="320" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Subresources: blob / vault / …</text>
+
+  <rect x="620" y="360" width="260" height="70" fill="#ffffff" stroke="#0b6a0b" stroke-width="1.5"/>
+  <text x="750" y="388" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Private DNS zone group</text>
+  <text x="750" y="408" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Auto-registers PE NIC → private IP</text>
+
+  <line x1="880" y1="295" x2="940" y2="295" stroke="#0b6a0b" stroke-width="2.5" marker-end="url(#arrowOk)"/>
+  <text x="895" y="285" fill="#0b6a0b" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="700">DATA</text>
+
+  <!-- ===================== ZONE: PAAS ===================== -->
+  <rect x="920" y="100" width="256" height="420" fill="#e8f0fe" stroke="#185abd" stroke-width="2" rx="2"/>
+  <rect x="920" y="100" width="256" height="32" fill="#185abd"/>
+  <text x="936" y="122" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">AZURE PAAS (LOCKED)</text>
+
+  <rect x="940" y="150" width="216" height="100" fill="#ffffff" stroke="#185abd" stroke-width="1.5"/>
+  <text x="1048" y="178" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">Storage Account</text>
+  <text x="1048" y="198" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">TLS 1.2+ · no public blobs</text>
+  <text x="1048" y="216" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">network_rules default Deny</text>
+  <text x="1048" y="234" text-anchor="middle" fill="#0b6a0b" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="600">public access = OFF</text>
+
+  <rect x="940" y="270" width="216" height="100" fill="#ffffff" stroke="#185abd" stroke-width="1.5"/>
+  <text x="1048" y="298" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">Key Vault</text>
+  <text x="1048" y="318" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">RBAC · soft delete</text>
+  <text x="1048" y="336" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">purge protect (non-dev)</text>
+  <text x="1048" y="354" text-anchor="middle" fill="#0b6a0b" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="600">public access = OFF</text>
+
+  <rect x="940" y="390" width="216" height="60" fill="#fff4ce" stroke="#986f0b" stroke-width="1.5"/>
+  <text x="1048" y="415" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="700">ISO control point</text>
+  <text x="1048" y="433" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Break-glass var is loud + OPA deny</text>
+
+  <!-- Denied public path into PaaS from internet box -->
+  <path d="M 134 310 C 134 470, 1048 470, 1048 250" fill="none" stroke="#a4262c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrowDeny)"/>
+  <text x="520" y="490" fill="#a4262c" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="700">Public data path denied (OPA / module defaults / Checkov)</text>
+
+  <!-- ===================== GOVERNANCE BAND ===================== -->
+  <rect x="24" y="540" width="1152" height="220" fill="#ffffff" stroke="#605e5c" stroke-width="2" rx="2"/>
+  <rect x="24" y="540" width="1152" height="32" fill="#323130"/>
+  <text x="40" y="562" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">PLATFORM GOVERNANCE &amp; DELIVERY FLOW</text>
+
+  <!-- Boxes in governance -->
+  <rect x="44" y="592" width="160" height="88" fill="#f3f2f1" stroke="#605e5c" stroke-width="1.5"/>
+  <text x="124" y="622" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">Policy pack</text>
+  <text x="124" y="642" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">YAML / JSON</text>
+  <text x="124" y="658" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">naming · security</text>
+  <text x="124" y="674" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">networking · tags</text>
+
+  <line x1="204" y1="636" x2="236" y2="636" stroke="#1f4e79" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="236" y="592" width="160" height="88" fill="#f3f2f1" stroke="#605e5c" stroke-width="1.5"/>
+  <text x="316" y="622" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">tf-factory</text>
+  <text x="316" y="642" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">scaffold · generate-naming</text>
+  <text x="316" y="658" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">export-policy-data</text>
+  <text x="316" y="674" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">catalog references</text>
+
+  <line x1="396" y1="636" x2="428" y2="636" stroke="#1f4e79" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="428" y="592" width="160" height="88" fill="#f3f2f1" stroke="#605e5c" stroke-width="1.5"/>
+  <text x="508" y="622" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">Module catalog</text>
+  <text x="508" y="642" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">naming · PE</text>
+  <text x="508" y="658" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">key-vault · storage</text>
+  <text x="508" y="674" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">Private by default</text>
+
+  <line x1="588" y1="636" x2="620" y2="636" stroke="#1f4e79" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="620" y="592" width="160" height="88" fill="#f3f2f1" stroke="#605e5c" stroke-width="1.5"/>
+  <text x="700" y="622" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">CI (ADO)</text>
+  <text x="700" y="642" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">fmt · validate · pytest</text>
+  <text x="700" y="658" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">tflint · Checkov</text>
+  <text x="700" y="674" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">policy sync drift</text>
+
+  <line x1="780" y1="636" x2="812" y2="636" stroke="#1f4e79" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="812" y="592" width="160" height="88" fill="#f3f2f1" stroke="#605e5c" stroke-width="1.5"/>
+  <text x="892" y="622" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">TFE / HCP TF</text>
+  <text x="892" y="642" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">VCS modules</text>
+  <text x="892" y="658" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">source_directory</text>
+  <text x="892" y="674" text-anchor="middle" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="10">registry …/azurerm</text>
+
+  <line x1="972" y1="636" x2="1004" y2="636" stroke="#1f4e79" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="1004" y="592" width="152" height="88" fill="#dff6dd" stroke="#0b6a0b" stroke-width="1.5"/>
+  <text x="1080" y="622" text-anchor="middle" fill="#0b6a0b" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700">OPA (plan)</text>
+  <text x="1080" y="642" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="10">deny public access</text>
+  <text x="1080" y="658" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="10">require tags / patterns</text>
+  <text x="1080" y="674" text-anchor="middle" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="10">YAML require/deny</text>
+
+  <!-- Legend -->
+  <text x="44" y="720" fill="#323130" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="700">Legend</text>
+  <line x1="100" y1="716" x2="140" y2="716" stroke="#0b6a0b" stroke-width="2.5"/>
+  <text x="148" y="720" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Allowed private data path</text>
+  <line x1="320" y1="716" x2="360" y2="716" stroke="#a4262c" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <text x="368" y="720" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Denied public path</text>
+  <rect x="520" y="706" width="14" height="14" fill="#fff4ce" stroke="#986f0b"/>
+  <text x="540" y="720" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">Shared ownership / control point</text>
+  <text x="780" y="720" fill="#605e5c" font-family="Segoe UI, Arial, sans-serif" font-size="11">ACLs = defense-in-depth only — not a substitute for Private Link</text>
+
+  <text x="44" y="748" fill="#8a8886" font-family="Segoe UI, Arial, sans-serif" font-size="10">Source: terraform-module-factory  ·  Open in browser or import SVG into Visio / PowerPoint  ·  Companion: docs/architecture/README.md</text>
+</svg>
