@@ -18,6 +18,8 @@ Platform engineering toolkit for building Terraform modules that meet **secure b
 
 **Publishing:** monorepo + HCP/TFE VCS modules with `source_directory` — see [`docs/TFE_PUBLISHING.md`](docs/TFE_PUBLISHING.md).
 
+**Architecture (app teams & ISO):** Visio-style Private Link diagram — [`docs/architecture/private-link-baseline.svg`](docs/architecture/private-link-baseline.svg) ([guide](docs/architecture/README.md)).
+
 ## Repository layout
 
 ```text
